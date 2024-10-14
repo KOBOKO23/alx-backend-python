@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
-"""
-A module for creating and running multiple asyncio Tasks concurrently.
-"""
+""" Tasks """
 import asyncio
 from typing import List
+
 task_wait_random = __import__('3-tasks').task_wait_random
 
 
 async def task_wait_n(n: int, max_delay: int) -> List[float]:
+    """ Async routine.
+        Args:
+            max_delay: integer argument.
+            n: integer argument.
+        Return:
+            List of all the delays random float.
     """
-    Create and run `n` asyncio Tasks that wait for random amounts of time
-    up to `max_delay` seconds. Returns a list of the Task objects, sorted
-    in ascending order by the time waited.
-    """
-    wait_times = await asyncio.gather(
-        *tuple(map(lambda _: task_wait_random(max_delay), range(n)))
-    )
-    return sorted(wait_times
+    delays: List[float] = []
+    orderList: List[float] = []
+
+    for i in range(n):
+        delays.append(task_wait_random(max_delay))
+
+    for o in asyncio.as_completed(delays):
+        orderList.append(await o)
+
+    return orderList
